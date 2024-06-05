@@ -83,6 +83,7 @@ def retry_on_exception(  # noqa: C901
                 while attempts < retries:
                     try:
                         async for item in func(*args, **kwargs):
+                            attempts = 0
                             yield item
                     except exception_type as e:
                         exc_obj = e
@@ -92,10 +93,10 @@ def retry_on_exception(  # noqa: C901
                     except Exception:
                         raise
 
-                    _log_final(func, logger, exception_type, message)
-                    if reraise:
-                        raise exc_obj
-                    yield None
+                _log_final(func, logger, exception_type, message)
+                if reraise:
+                    raise exc_obj
+                yield None
 
         else:
             @wraps(func)
